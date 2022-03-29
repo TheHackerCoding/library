@@ -12,3 +12,11 @@ jobs:
         with:
           toolchain: stable
       - run: cargo build --release --all-features
+      - uses: actions/upload-artifact@v3
+        with:
+          name: library
+          path: target/release/library
+      - uses: actions/upload-artifact@v3
+        with:
+          name: viewer
+          path: target/release/viewer
