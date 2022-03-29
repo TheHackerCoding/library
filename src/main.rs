@@ -1,24 +1,76 @@
-mod file;
+mod library;
+mod ui;
+mod utils;
 
-use eframe::{epi, egui};
+use eframe::{
+    egui,
+    epi::{self, Storage},
+};
+use library::{Library, MusicFile};
+use utils::ICON;
 
-#[derive(Default)]
-struct MyEguiApp {}
+use crate::utils::RAW_ICON;
+#[macro_use]
+extern crate lazy_static;
+pub struct GUI {
+    library: Library,
+    state: GUIState,
+}
 
-impl epi::App for MyEguiApp {
-   fn name(&self) -> &str {
-       "My egui App"
-   }
+struct GUIState {
+    audio_setup: bool,
+    tmp_music: MusicFile,
+}
 
-   fn update(&mut self, ctx: &egui::CtxRef, frame: &epi::Frame) {
-       egui::CentralPanel::default().show(ctx, |ui| {
-           ui.heading("Hello World!");
-       });
-   }
+impl Default for GUI {
+    fn default() -> Self {
+        Self {
+            library: Library::default(),
+            state: GUIState {
+                audio_setup: false,
+                tmp_music: MusicFile::none(),
+            },
+        }
+    }
+}
+
+impl epi::App for GUI {
+    fn name(&self) -> &str {
+        "_null"
+    }
+
+    fn update(&mut self, ctx: &egui::CtxRef, _frame: &epi::Frame) {
+        egui::SidePanel::left("left").show(ctx, |ui| {
+            ui.heading("Folders");
+            ui.separator();
+            ui.painter();
+        });
+        egui::CentralPanel::default().show(ctx, |ui| self.selector(ctx, ui));
+    }
+
+    fn save(&mut self, _storage: &mut dyn Storage) {
+        self.library.save().unwrap();
+    }
+
+    fn on_exit(&mut self) {
+        self.library.save().unwrap();
+    }
 }
 
 fn main() {
-    let app = MyEguiApp::default();
-    let native_options = eframe::NativeOptions::default();
-    eframe::run_native(Box::new(app), native_options);
+    lazy_static::initialize(&RAW_ICON);
+    lazy_static::initialize(&ICON);
+    let mut app = GUI::default();
+    //println!("{:?}", ICON.to_owned().into_bytes());
+    let options = eframe::NativeOptions {
+        icon_data: Some(epi::IconData {
+            rgba: ICON.to_owned().into_bytes(),
+            width: ICON.width(),
+            height: ICON.height(),
+        }),
+        drag_and_drop_support: true,
+        ..Default::default()
+    };
+    //let mut native_options = eframe::NativeOptions::default();
+    eframe::run_native(Box::new(app), options);
 }
