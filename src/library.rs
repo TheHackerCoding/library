@@ -127,7 +127,12 @@ impl Library {
         println!("encode: {:?}", out);
         out
     }
+
+    pub fn query(&mut self) -> Vec<MusicFile> {
+        self.data.query()
+    }
 }
+
 
 impl Folder {
     pub fn add_music(&mut self, url: &str, name: &str) {
@@ -140,6 +145,16 @@ impl Folder {
             favorite: false,
         };
         self.files.push(file);
+    }
+    
+    pub fn query(&mut self) -> Vec<MusicFile> {
+        let mut result: Vec<MusicFile> = vec![];
+        let folders = &mut self.subfolders;
+        if folders.len() > 0 {
+            folders.iter_mut().for_each(|x| result.extend(x.query()));
+        }
+        result.extend(self.files.to_owned());
+        result
     }
 }
 

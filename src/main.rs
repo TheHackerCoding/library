@@ -20,15 +20,19 @@ pub struct GUI {
 struct GUIState {
     audio_setup: bool,
     tmp_music: MusicFile,
+    all_music: Vec<MusicFile>,
 }
 
 impl Default for GUI {
     fn default() -> Self {
+        let mut lib = Library::default();
         Self {
-            library: Library::default(),
+            library: lib,
             state: GUIState {
                 audio_setup: false,
                 tmp_music: MusicFile::none(),
+                // uhh yea i need to do this
+                all_music: Library::default().query()
             },
         }
     }
@@ -40,6 +44,8 @@ impl epi::App for GUI {
     }
 
     fn update(&mut self, ctx: &egui::CtxRef, _frame: &epi::Frame) {
+        // uhh update
+        self.state.all_music = self.library.query();
         egui::SidePanel::left("left").show(ctx, |ui| {
             ui.heading("Folders");
             ui.separator();

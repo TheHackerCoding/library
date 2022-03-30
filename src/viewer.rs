@@ -39,8 +39,6 @@ fn main() {
     eframe::run_native(Box::new(app), native_options);
 }
 
-fn data(ui: &mut Ui) {}
-
 impl Folder {
     fn view(&mut self, ui: &mut Ui) {
         ui.indent("folder", |ui| {

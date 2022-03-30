@@ -5,13 +5,13 @@ use crate::{
     utils::audio_file_picker,
     GUI,
 };
-use eframe::egui::{self, CtxRef, Response, Sense};
+use eframe::egui::{self, CtxRef, Response};
 
 impl GUI {
     pub fn selector(&mut self, ctx: &egui::CtxRef, ui: &mut egui::Ui) {
         ui.heading("Library");
         ui.separator();
-        if self.library.data.files.len() == 0 && self.library.data.subfolders.len() == 0 {
+        if self.state.all_music.len() == 0 {
             let cont = ui.centered_and_justified(|ui| {
                 ui.heading("No files!");
             });
@@ -23,9 +23,14 @@ impl GUI {
     }
 
     fn _selector(&mut self, ctx: &egui::CtxRef, ui: &mut egui::Ui) {
-        let size = ui.available_size();
-        let (_rect, res) = ui.allocate_exact_size(size, Sense::click_and_drag());
-        self.menu(ctx, &res)
+        // let size = ui.available_size();
+        // let (_rect, res) = ui.allocate_exact_size(size, Sense::click_and_drag());
+        // self.menu(ctx, &res)
+        egui::ScrollArea::horizontal().show(ui, |ui| {
+            self.state.all_music.iter_mut().for_each(|x| {
+                music_ui(x, ui);
+            })
+        });
     }
 
     fn menu(&mut self, ctx: &egui::CtxRef, res: &Response) {
@@ -133,4 +138,14 @@ impl GUI {
                 }
             });
     }
+
+    
+}
+
+fn music_ui(data: &MusicFile, ui: &mut egui::Ui) {
+    ui.horizontal(|ui| {
+        ui.label(format!("{}", data.name));
+        ui.add(egui::Separator::default().vertical());
+        ui.label(format!("{}", data.maker));
+    });
 }
