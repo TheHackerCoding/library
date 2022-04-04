@@ -7,9 +7,7 @@ use eframe::{
     epi::{self, Storage},
 };
 use library::{Library, MusicFile};
-use utils::ICON;
-
-use crate::utils::RAW_ICON;
+use utils::{ICON, RAW_ICON};
 #[macro_use]
 extern crate lazy_static;
 pub struct GUI {
@@ -32,7 +30,7 @@ impl Default for GUI {
                 audio_setup: false,
                 tmp_music: MusicFile::none(),
                 // uhh yea i need to do this
-                all_music: Library::default().query()
+                all_music: Library::default().query(),
             },
         }
     }

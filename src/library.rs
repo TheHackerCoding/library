@@ -78,7 +78,7 @@ impl Library {
         let result: String;
         let username = whoami::username();
         match whoami::platform() {
-            whoami::Platform::Windows => result = format!("C:/{}/AppData/Local/_null/", username),
+            whoami::Platform::Windows => result = format!("C:/Users/{}/AppData/Local/_null/", username),
             whoami::Platform::Linux => result = format!("/home/{}/.config/_null/", username),
             whoami::Platform::MacOS => result = format!("/Users/{}/.config/_null/", username),
             _ => panic!("Unknown platform"),

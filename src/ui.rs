@@ -5,7 +5,7 @@ use crate::{
     utils::audio_file_picker,
     GUI,
 };
-use eframe::egui::{self, CtxRef, Response};
+use eframe::egui::{self, CtxRef, Response, Sense};
 
 impl GUI {
     pub fn selector(&mut self, ctx: &egui::CtxRef, ui: &mut egui::Ui) {
@@ -23,14 +23,14 @@ impl GUI {
     }
 
     fn _selector(&mut self, ctx: &egui::CtxRef, ui: &mut egui::Ui) {
-        // let size = ui.available_size();
-        // let (_rect, res) = ui.allocate_exact_size(size, Sense::click_and_drag());
-        // self.menu(ctx, &res)
         egui::ScrollArea::horizontal().show(ui, |ui| {
             self.state.all_music.iter_mut().for_each(|x| {
                 music_ui(x, ui);
             })
         });
+        let size = ui.available_size();
+        let (_rect, res) = ui.allocate_exact_size(size, Sense::click_and_drag());
+        self.menu(ctx, &res);
     }
 
     fn menu(&mut self, ctx: &egui::CtxRef, res: &Response) {
@@ -45,11 +45,16 @@ impl GUI {
             let folder_button = ui.button("Add folder");
 
             if file_button.clicked() {
-                file = audio_file_picker();
-                self.state.tmp_music.location = file.to_str().unwrap().clone().to_string();
-                self.state.tmp_music.name = file.file_name().unwrap().to_str().unwrap().to_string();
-                self.state.audio_setup = true;
-                ui.close_menu();
+                match audio_file_picker() {
+                    Some(file) => {
+                        self.state.tmp_music.location = file.to_str().unwrap().clone().to_string();
+                        self.state.tmp_music.name =
+                            file.file_name().unwrap().to_str().unwrap().to_string();
+                        self.state.audio_setup = true;
+                        ui.close_menu();
+                    }
+                    None => println!("huh no file picked"),
+                }
             }
         });
     }
@@ -138,14 +143,17 @@ impl GUI {
                 }
             });
     }
-
-    
 }
 
 fn music_ui(data: &MusicFile, ui: &mut egui::Ui) {
-    ui.horizontal(|ui| {
+    let widget = ui.horizontal(|ui| {
         ui.label(format!("{}", data.name));
         ui.add(egui::Separator::default().vertical());
         ui.label(format!("{}", data.maker));
     });
+
+    if widget.response.double_clicked() {
+        println!("uhh double clicked");
+        open::that_in_background(&data.location);
+    }
 }

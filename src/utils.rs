@@ -3,11 +3,8 @@ use std::path::PathBuf;
 use image::DynamicImage;
 use rfd::FileDialog;
 
-pub fn audio_file_picker() -> PathBuf {
-    FileDialog::new()
-        .add_filter("audio", &["wav"])
-        .pick_file()
-        .unwrap()
+pub fn audio_file_picker() -> Option<PathBuf> {
+    FileDialog::new().add_filter("audio", &["wav"]).pick_file()
 }
 
 lazy_static! {
