@@ -1,7 +1,7 @@
+mod compressed;
 mod library;
 mod ui;
 mod utils;
-
 use eframe::{
     egui,
     epi::{self, Storage},
@@ -46,6 +46,7 @@ impl epi::App for GUI {
         self.state.all_music = self.library.query();
         egui::SidePanel::left("left").show(ctx, |ui| {
             ui.heading("Folders");
+            self.library.data.tree(ui);
             ui.separator();
             ui.painter();
         });

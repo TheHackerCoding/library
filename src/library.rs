@@ -1,9 +1,10 @@
+use crate::compressed::CompressedFile;
+use eframe::egui::{self, CollapsingHeader};
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::Path;
 use std::time::SystemTime;
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Library {
     pub updated: SystemTime,
@@ -78,7 +79,9 @@ impl Library {
         let result: String;
         let username = whoami::username();
         match whoami::platform() {
-            whoami::Platform::Windows => result = format!("C:/Users/{}/AppData/Local/_null/", username),
+            whoami::Platform::Windows => {
+                result = format!("C:/Users/{}/AppData/Local/_null/", username)
+            }
             whoami::Platform::Linux => result = format!("/home/{}/.config/_null/", username),
             whoami::Platform::MacOS => result = format!("/Users/{}/.config/_null/", username),
             _ => panic!("Unknown platform"),
@@ -133,7 +136,6 @@ impl Library {
     }
 }
 
-
 impl Folder {
     pub fn add_music(&mut self, url: &str, name: &str) {
         let file = MusicFile {
@@ -146,7 +148,7 @@ impl Folder {
         };
         self.files.push(file);
     }
-    
+
     pub fn query(&mut self) -> Vec<MusicFile> {
         let mut result: Vec<MusicFile> = vec![];
         let folders = &mut self.subfolders;
@@ -156,6 +158,21 @@ impl Folder {
         result.extend(self.files.to_owned());
         result
     }
+
+    pub fn tree(&mut self, ui: &mut egui::Ui) {
+        let folders = &mut self.subfolders;
+        let files = &mut self.files;
+        ui.collapsing(&self.name, |ui| {
+            if folders.len() > 0 {
+                folders.iter_mut().for_each(|x| x.tree(ui));
+            }
+            if files.len() > 0 {
+                files.iter_mut().for_each(|x| x.tree_view(ui));
+            }
+        });
+    }
+
+    pub fn compressed(&mut self) -> CompressedFile {}
 }
 
 impl MusicFile {
@@ -168,6 +185,10 @@ impl MusicFile {
             maker: String::new(),
             favorite: false,
         }
+    }
+
+    pub fn tree_view(&mut self, ui: &mut egui::Ui) {
+        ui.label(&self.name);
     }
 }
 
